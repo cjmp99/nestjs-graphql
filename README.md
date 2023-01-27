@@ -45,19 +45,6 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
-## Test
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
 ## Skills
 
 ```bash
@@ -78,6 +65,130 @@ mutation {
     name
   }
 }
+```
+
+## Developers
+
+```bash
+# Query developers
+{
+  developers {
+    id
+    name
+    email
+    projects {
+      name
+    }
+    skills {
+      name
+    }
+  }
+}
+
+{
+  developers(role: "Backend") {
+    id
+    name
+    email
+  }
+}
+
+# Mutation developer
+mutation {
+  createDeveloper(createDeveloperInput: {
+    name: "front dev",
+    email: "test@gmail.com",
+    skills: [2] #idSkill,
+  }) {
+    id
+    name
+    email
+    skills {
+      name
+    }
+  }
+}
+
+mutation {
+  updateDeveloper(updateDeveloperInput: {
+    id: 2,
+    skills: [1, 2]
+  }) {
+    id
+    name
+    email
+    skills {
+      id
+      name
+    }
+  }
+}
+```
+
+## Projects
+
+```bash
+
+# Query projects
+{
+  projects {
+    name
+    description
+    developers {
+      name
+    }
+    skills {
+      name
+    }
+  }
+}
+
+{
+  projects(role: "Frontend") {
+    name
+    description
+  }
+}
+
+# Mutations projects
+mutation {
+  createProject(projectInput: {
+    name: "react project",
+    description: "desc",
+    skills: [2]
+    
+  }) {
+    id
+    name
+    description
+    developers {
+      id
+      name
+    }
+    skills {
+      name
+    }
+  }
+}
+
+mutation {
+  updateProject(updateProjectInput: {
+    id: 1,
+    developers: [3]
+  }) {
+    id
+    name
+    description
+    developers {
+      id
+      name
+    }
+    skills {
+      name
+    }
+  }
+}
+
 ```
 
 ## Support
