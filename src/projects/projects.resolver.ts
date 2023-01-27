@@ -1,5 +1,6 @@
 import { Mutation, Query, Resolver, Args, Int, ResolveField, Parent } from '@nestjs/graphql';
 import { Developer } from 'src/developers/entities/developer.entity';
+import { Skill } from 'src/skills/entities/skill.entity';
 import { CreateProjectInput } from './dto/create-project.input';
 import { UpdateProjectInput } from './dto/update-project.input';
 import { Project } from './entities/projects.entity';
@@ -10,8 +11,12 @@ export class ProjectsResolver {
   constructor(private projectService: ProjectsService) { }
 
   @Query(() => [Project])
-  projects() {
-    return this.projectService.findAll();
+  projects(@Args('role', { nullable: true }) role?: string) {
+    if (role) {
+      return this.projectService.filterByRole(role);
+    } else {
+      return this.projectService.findAll();
+    }
   }
 
   @Query(() => Project)
@@ -32,5 +37,10 @@ export class ProjectsResolver {
   @ResolveField(() => Developer)
   async developers(@Parent() project: Project) {
     return await this.projectService.findAllDevelopers(project.developers);
+  }
+
+  @ResolveField(() => Skill)
+  async skills(@Parent() project: Project) {
+    return await this.projectService.findAllSkills(project.skills);
   }
 }

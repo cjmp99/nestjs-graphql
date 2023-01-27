@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Project } from 'src/projects/entities/projects.entity';
-import { ProjectsService } from 'src/projects/projects.service';
+import { Skill } from 'src/skills/entities/skill.entity';
 import { Repository } from 'typeorm';
 import { CreateDeveloperInput } from './dto/create-developer.input';
 import { UpdateDeveloperInput } from './dto/update-developer.input';
@@ -12,28 +12,15 @@ export class DevelopersService {
   constructor(
     @InjectRepository(Developer) private developerRepository: Repository<Developer>,
     @InjectRepository(Project) private projectRepository: Repository<Project>,
+    @InjectRepository(Skill) private skillRepository: Repository<Skill>,
   ) { }
-
-  async create(createDeveloperInput: CreateDeveloperInput): Promise<Developer> {
-    const newDeveloper = new Developer();
-    newDeveloper.name = createDeveloperInput.name;
-    newDeveloper.email = createDeveloperInput.email;
-    if (createDeveloperInput?.projects) {
-      const projectsIds = createDeveloperInput.projects;
-      const projects = await this.projectRepository.findByIds(projectsIds);
-      newDeveloper.projects = projects;
-      return this.developerRepository.save(newDeveloper);
-    } else {
-      return this.developerRepository.save(newDeveloper);
-    }
-  }
 
   findAll(id?: number): Promise<Developer[]> {
     return this.developerRepository.find({
       where: {
         id
       },
-      relations: ['projects']
+      relations: ['projects', 'skills']
     });
   }
 
@@ -41,6 +28,23 @@ export class DevelopersService {
     return this.projectRepository.findByIds(
       ids,
     );
+  }
+
+  findAllSkills(ids?: Skill[]): Promise<Skill[]> {
+    return this.skillRepository.findByIds(
+      ids,
+    );
+  }
+
+  async filterByRole(role?: string): Promise<Developer[]> {
+    const gettingRoles = await this.skillRepository.find({
+      where: {
+        name: role
+      },
+      relations: ['developers', 'projects'],
+    });
+
+    return gettingRoles[0].developers;
   }
 
   findById(id: number): Promise<Developer> {
@@ -52,23 +56,40 @@ export class DevelopersService {
     });
   }
 
+  async create(createDeveloperInput: CreateDeveloperInput): Promise<Developer> {
+    const newDeveloper = new Developer();
+    newDeveloper.name = createDeveloperInput.name;
+    newDeveloper.email = createDeveloperInput.email;
+    if (createDeveloperInput?.skills) {
+      const skillIds = createDeveloperInput.skills;
+      const skills = await this.skillRepository.findByIds(skillIds);
+      newDeveloper.skills = skills;
+      return this.developerRepository.save(newDeveloper);
+    } else {
+      return this.developerRepository.save(newDeveloper);
+    }
+  }
+
   async update(id: number, updateDeveloperInput: UpdateDeveloperInput): Promise<Developer> {
     const updateDeveloper = new Developer();
     updateDeveloper.id = id;
     updateDeveloper.name = updateDeveloperInput.name;
     updateDeveloper.email = updateDeveloperInput.email;
-    if (updateDeveloperInput?.projects) {
-      const projectsIds = updateDeveloperInput.projects;
-      const projects = await this.projectRepository.findByIds(projectsIds);
-      updateDeveloper.projects = projects;
-      
+    const devPreload = await this.developerRepository.findOne({ where: { id }, relations: ['projects', 'skills'] });
+
+    if (updateDeveloperInput?.skills) {
+      const skillsIds = updateDeveloperInput.skills;
+      const skills = await this.skillRepository.findByIds(skillsIds);
+      updateDeveloper.skills = skills;
+      updateDeveloper.projects = devPreload.projects;
       const dev = await this.developerRepository.preload(updateDeveloper);
       if (dev) {
         return this.developerRepository.save(dev);
       }
+
     } else {
-      const devPreload = await this.developerRepository.findOne({ where: { id }, relations: ['projects'] });      
-      updateDeveloper.projects = devPreload.projects;
+      updateDeveloper.projects = devPreload?.projects;
+      updateDeveloper.skills = devPreload.skills;
 
       const dev = await this.developerRepository.preload(updateDeveloper);
       if (dev) {

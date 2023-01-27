@@ -2,12 +2,20 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Skill {
+  id: Int!
+  name: String!
+  projects: [Project!]
+  developers: [Developer!]
+}
+
 type Project {
   id: Int!
   name: String!
   description: String!
   status: Boolean!
   developers: [Developer!]
+  skills: [Skill!]
 }
 
 type Developer {
@@ -15,13 +23,16 @@ type Developer {
   name: String!
   email: String!
   projects: [Project!]
+  skills: [Skill!]
 }
 
 type Query {
-  projects: [Project!]!
+  projects(role: String): [Project!]!
   projectById(id: Int!): Project!
-  developers: [Developer!]!
+  developers(role: String): [Developer!]!
   developer(id: Int!): Developer!
+  skills: [Skill!]!
+  skill(id: Int!): Skill!
 }
 
 type Mutation {
@@ -29,32 +40,40 @@ type Mutation {
   updateProject(updateProjectInput: UpdateProjectInput!): Project!
   createDeveloper(createDeveloperInput: CreateDeveloperInput!): Developer!
   updateDeveloper(updateDeveloperInput: UpdateDeveloperInput!): Developer!
+  createSkill(createSkillInput: CreateSkillInput!): Skill!
 }
 
 input CreateProjectInput {
   name: String!
   description: String
   status: Boolean! = true
-  developers: [Int!]
+  skills: [Int!]
 }
 
 input UpdateProjectInput {
   name: String
   description: String
   status: Boolean = true
-  developers: [Int!]
+  skills: [Int!]
   id: Int!
+  developers: [Int!]
 }
 
 input CreateDeveloperInput {
   name: String!
   email: String!
   projects: [Int!]
+  skills: [Int!]
 }
 
 input UpdateDeveloperInput {
   name: String
   email: String
   projects: [Int!]
+  skills: [Int!]
   id: Int!
+}
+
+input CreateSkillInput {
+  name: String!
 }

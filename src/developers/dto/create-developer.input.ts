@@ -14,4 +14,7 @@ export class CreateDeveloperInput {
 
   @Field(() => [Int], { nullable: true })
   projects?: number[];
+
+  @Field(() => [Int], { nullable: true })
+  skills?: number[];
 }

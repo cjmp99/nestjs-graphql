@@ -16,7 +16,7 @@ export class CreateProjectInput {
 
   @Field({ defaultValue: true })
   status?: boolean;
-
+  
   @Field(() => [Int], { nullable: true })
-  developers?: number[];
+  skills?: number[];
 }

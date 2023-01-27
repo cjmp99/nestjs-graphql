@@ -5,11 +5,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Project } from './entities/projects.entity';
 import { DevelopersModule } from 'src/developers/developers.module';
 import { Developer } from 'src/developers/entities/developer.entity';
+import { Skill } from 'src/skills/entities/skill.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Project, Developer]),
+    TypeOrmModule.forFeature([Project, Developer, Skill]),
   ], 
   providers: [ProjectsService, ProjectsResolver],
+  exports: [ProjectsService]
 })
 export class ProjectsModule {}

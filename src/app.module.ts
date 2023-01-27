@@ -7,6 +7,7 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { join } from 'path';
 import { DevelopersModule } from './developers/developers.module';
+import { SkillsModule } from './skills/skills.module';
 
 @Module({
   imports: [GraphQLModule.forRoot<ApolloDriverConfig>({
@@ -20,7 +21,8 @@ import { DevelopersModule } from './developers/developers.module';
     synchronize: true
   }),
     ProjectsModule,
-    DevelopersModule
+    DevelopersModule,
+    SkillsModule
   ],
   controllers: [AppController],
   providers: [AppService],

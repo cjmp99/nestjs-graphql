@@ -4,8 +4,9 @@ import { Developer } from './entities/developer.entity';
 import { CreateDeveloperInput } from './dto/create-developer.input';
 import { UpdateDeveloperInput } from './dto/update-developer.input';
 import { Project } from 'src/projects/entities/projects.entity';
+import { Skill } from 'src/skills/entities/skill.entity';
 
-@Resolver((of) => Developer)
+@Resolver(() => Developer)
 export class DevelopersResolver {
   constructor(private readonly developersService: DevelopersService) { }
 
@@ -15,8 +16,12 @@ export class DevelopersResolver {
   }
 
   @Query(() => [Developer])
-  developers() {
-    return this.developersService.findAll();
+  developers(@Args('role', { nullable: true }) role: string) {
+    if(role) {
+      return this.developersService.filterByRole(role);
+    }else{
+      return this.developersService.findAll();
+    }
   }
 
   @Query(() => Developer)
@@ -24,14 +29,19 @@ export class DevelopersResolver {
     return this.developersService.findById(id);
   }
 
+  @Mutation(() => Developer)
+  updateDeveloper(@Args('updateDeveloperInput') updateDeveloperInput: UpdateDeveloperInput) {
+    return this.developersService.update(updateDeveloperInput.id, updateDeveloperInput);
+  }
+
   @ResolveField(() => Project)
   async projects(@Parent() dev: Developer) {
     return await this.developersService.findAllProjects(dev.projects);
   }
 
-  @Mutation(() => Developer)
-  updateDeveloper(@Args('updateDeveloperInput') updateDeveloperInput: UpdateDeveloperInput) {
-    return this.developersService.update(updateDeveloperInput.id, updateDeveloperInput);
+  @ResolveField(() => Skill)
+  async skills(@Parent() dev: Developer) {
+    return await this.developersService.findAllSkills(dev.skills);
   }
 
   // @Mutation(() => Developer)
